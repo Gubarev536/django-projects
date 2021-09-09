@@ -64,14 +64,14 @@ b.ratingAuthor
 
 9. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
 
-bestAuthor = Author.objects.all().order_by('-ratingAuthor').values('authorUser', 'ratingAuthor')[0] 
+bestAuthor = Author.objects.all().order_by('-ratingAuthor').values('authorUser.username', 'ratingAuthor')[0] 
 print(bestAuthor)
 
 10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
 
-bestPost = Post.objects.all().order_by('-rating').values('dateCreation', 'author', 'rating', 'title')[0] 
-print(bestPost)
+bestPost = Post.objects.all().order_by('-rating')
+bestPost.values('dateCreation', 'author__authorUser__username', 'rating', 'title')[0] 
 
 11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
 
-Comment.objects.get(bestPost).values('dateCreation', 'commentUser', 'rating', 'text')
+Comment.objects.all().order_by('-rating').values('dateCreation', 'commentUser', 'rating', 'text')

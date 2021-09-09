@@ -49,7 +49,7 @@ class Post(models.Model):
         self.save()
 
     def previw(self):
-        return self.text[0:123]
+        return self.text[0:123] + '...'
 
 class PostCategory(models.Model):
     postThrough = models.ForeignKey(Post, on_delete=models.CASCADE)
