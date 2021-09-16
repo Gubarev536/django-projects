@@ -20,20 +20,26 @@ class Author(models.Model):
 
         self.ratingAuthor = pRat * 3 + cRat
         self.save()
+        
+    def __str__(self):
+        return f'Автор: {self.authorUser.username}'
 
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
+    def __str__(self):
+        return f'{self.name}'
+
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     NEWS = 'NW'
     ARTICLE = 'AR'
-    CATEGORY_CHOISES = (
+    CATEGORY_CHOICES = (
         (NEWS, 'Новость'),
         (ARTICLE, 'Статья'),
     )
-    categoryType = models.CharField(max_length=2, choices=CATEGORY_CHOISES, default=ARTICLE)
+    categoryType = models.CharField(max_length=2, choices=CATEGORY_CHOICES, default=ARTICLE)
     dateCreation = models.DateTimeField(auto_now_add=True)
     PostCategory = models.ManyToManyField(Category, through='PostCategory')
     title = models.CharField(max_length=128)
@@ -50,6 +56,10 @@ class Post(models.Model):
 
     def previw(self):
         return self.text[0:123] + '...'
+        
+    def __str__(self):
+        return f'{self.title.title()}: {self.text[:20]}'
+    
 
 class PostCategory(models.Model):
     postThrough = models.ForeignKey(Post, on_delete=models.CASCADE)
