@@ -1,0 +1,49 @@
+{% extends 'flatpages/default.html' %} 
+
+{% load custom_filters %} <!-- не забываем заранее загружать наши фильтры! -->
+
+{% block title %} Post delete {% endblock title %}
+
+{% block content %}
+<h2>Вы действительно хотите удалить данный пост?</h2>
+<table>
+    <thead>
+        <td>
+            Дата публикации
+        </td>
+        <td>
+            Автор
+        </td>
+        <td>
+            Заголовок
+        </td>
+        <td>
+            Текст
+        </td>            
+        <td>
+            Категория
+        </td>               
+    </thead>
+    <tr>
+        <td>
+            {{ post.dateCreation|date:'d.m.Y' }} 
+        </td>
+        <td>
+            {{ post.author }} 
+        </td>
+        <td>
+            {{ post.title|censor }}            
+        </td>
+        <td>
+            {{ post.text|truncatechars:50|censor }}
+        </td>
+        <td>
+            {{ post.get_categoryType_display }}
+        </td>                   
+    </tr>
+</table>
+ 
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Подтвердить"></form>
+{% endblock content %} 

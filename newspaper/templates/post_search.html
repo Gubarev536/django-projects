@@ -1,0 +1,67 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %} 
+
+{% load custom_filters %} <!-- не забываем заранее загружать наши фильтры! -->
+ 
+<!-- Название у нас будет proudcts -->
+{% block title %}
+Post Search
+{% endblock title %}
+ 
+<!-- В контенте на странице мы выводим все -->
+{% block content %}
+<h1>Поиск поста</h1>
+
+<!-- Перед таблицей добавим форму для поиска -->
+<form method="GET">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+    <input type="submit" value="Найти">
+</form>
+<hr>
+<table>
+    <tr>
+        <td>
+            Заголовок
+        </td>
+        <td>
+            Дата публикации
+        </td>
+        <td>
+            Автор
+        </td>
+        <td>
+            Текст
+        </td>            
+        <td>
+            Категория
+        </td>               
+    </tr>
+{% for post in filter.qs %}
+    <tr>
+        <td>
+            <a href="{% url 'post_detail' post.id %}">{{ post.title|censor }}</a>
+        </td>
+        <td>
+            {{ post.dateCreation|date:'d.m.Y' }} 
+        </td>
+        <td>
+            {{ post.author }} 
+        </td>
+        <td>
+            {{ post.text|truncatechars:50|censor }}
+        </td>
+        <td>
+            {{ post.get_categoryType_display }}
+        </td>
+        <td>  
+            <a href="{% url 'post_update' post.id %}"><u>Редактировать</u></a>
+        </td>
+        <td> 
+            <a href="{% url 'post_delete' post.id %}"><u> Удалить </u></a>
+        </td>                    
+    </tr>
+{% endfor %}
+</table>
+
+
+{% endblock content %}
