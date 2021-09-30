@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-drd4yxm@v_6cv0+)8x*15sn_(mb+7tyqs86%&lo&m6l@aj5e=7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
+
+# LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/sign/login/'
+LOGIN_REDIRECT_URL = '/news/'
 
 
 # Application definition
@@ -40,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'news',
     'accounts',
+    'sign',
 
     'django.contrib.sites',
     'django.contrib.flatpages',
@@ -67,9 +72,9 @@ ROOT_URLCONF = 'newspaper.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 'DIRS': [],
         'APP_DIRS': True,
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR/'templates'],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
