@@ -1,96 +1,100 @@
 <!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
-{% extends 'flatpages/default.html' %} 
+{% extends 'flatpages/default.html' %}
 
-{% load custom_filters %} <!-- не забываем заранее загружать наши фильтры! -->
- 
+<!-- не забываем заранее загружать наши фильтры! -->
+{% load custom_filters %}
+
 {% block title %}
-Posts
+    Posts
 {% endblock title %}
- 
+
 <!-- В контенте на странице мы выводим все новости-->
 {% block content %}
-<h1>Все новости</h1>
-<h> Количество новостей на странице: {{ news|length }} </h>
+    <h1>Все новости</h1>
+    <h4>{{ time_now|date:'d M Y' }}</h4>
+    <h> Количество новостей на странице: {{ news|length }} </h>
 
-<!-- Перед таблицей добавим форму для поиска -->
+    <!-- Перед таблицей добавим форму для поиска -->
 
-</form>
-<hr>
-<table>
-    <thead>
+    </form>
+    <hr>
+    <table>
+        <thead>
+            <tr>
+                <td>
+                    Заголовок
+                </td>
+                <td>
+                    Дата публикации
+                </td>
+                <td>
+                    Автор
+                </td>
+                <td>
+                    Текст
+                </td>
+                <td>
+                    Категория
+                </td>
+            </tr>
+        </thead>
+        {% for post in news %}
         <tr>
             <td>
-                Заголовок
+                <a href="{% url 'post_detail' post.id %}">{{ post.title|censor }}</a>
             </td>
             <td>
-                Дата публикации
+                {{ post.dateCreation|date:'d.m.Y' }}
             </td>
             <td>
-                Автор
+                {{ post.author }}
             </td>
             <td>
-                Текст
-            </td>            
+                {{ post.text|truncatechars:50|censor }}
+            </td>
             <td>
-                Категория
-            </td>               
+                {{ post.get_categoryType_display }}
+            </td>
+            {% if not is_not_author %}
+            <td>
+                <a href="{% url 'post_update' post.id %}"><u>Редактировать</u></a>
+            </td>
+            <td>
+                <a href="{% url 'post_delete' post.id %}"><u> Удалить </u></a>
+            </td>
+            {% endif %}
         </tr>
-    </thead>
-{% for post in news %}
-    <tr>
-        <td>
-            <a href="{% url 'post_detail' post.id %}">{{ post.title|censor }}</a>    
-        </td>
-        <td>
-            {{ post.dateCreation|date:'d.m.Y' }} 
-        </td>
-        <td>
-            {{ post.author }} 
-        </td>
-        <td>
-            {{ post.text|truncatechars:50|censor }}
-        </td>
-        <td>
-            {{ post.get_categoryType_display }}
-        </td>
-        <td>  
-            <a href="{% url 'post_update' post.id %}"><u>Редактировать</u></a>
-        </td>
-        <td> 
-            <a href="{% url 'post_delete' post.id %}"><u> Удалить </u></a>
-        </td>                   
-    </tr>
-{% endfor %}
-</table>
-<!-- Проверяем что поддерживается постраничный вывод -->
-{% if is_paginated %}
+        {% endfor %}
+    </table>
+    <!-- Проверяем что поддерживается постраничный вывод -->
+    {% if is_paginated %}
         <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
-    {% if page_obj.has_previous %}
-        <a href="?page=1">First</a>
-        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
-    {% endif %}
- 
-    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
-    {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-            <a>{{ num }}</a>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}">{{ num }}</a>
+        {% if page_obj.has_previous %}
+            <a href="?page=1">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
         {% endif %}
-    {% endfor %}
- 
-    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">>>></a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a>{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">>>></a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
     {% endif %}
- 
-{% endif %}
-<hr>
-<h3>
-<a href="{% url 'post_create' %}">Добавить пост</a> <br>
-</h3>
-<h3>
-<a href="{% url 'post_search' %}">Поиск</a> <br>
-</h3>
+    <hr>
+    {% if not is_not_author %}
+        <h3>
+            <a href="{% url 'post_create' %}">Добавить пост</a> <br>
+        </h3>
+    {% endif %}
+    <h3>
+        <a href="{% url 'post_search' %}">Поиск</a> <br>
+    </h3>
 {% endblock content %}

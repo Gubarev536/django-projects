@@ -8,6 +8,7 @@ class PostFilter(FilterSet):
     dateCreation = DateFromToRangeFilter(
         lookup_expr=('icontains'),
         widget=DateRangeWidget(
+            # не могу добиться нужного формата даты
             attrs={'type':'date'}
         )
     )
