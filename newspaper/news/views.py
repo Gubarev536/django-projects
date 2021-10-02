@@ -5,7 +5,7 @@ from django.views.generic import ListView, DetailView, UpdateView, CreateView, D
 from .models import Post, Author
 from datetime import datetime
 from django.core.paginator import Paginator
-from django.urls import reverse_lazy
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 from .post_filter import PostFilter
@@ -20,44 +20,58 @@ class PostList(ListView):
     context_object_name = 'news'
     ordering = ['-dateCreation']
     paginate_by = 2
-    success_url = '/news'
+    # success_url = '/news'
 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['time_now'] = datetime.utcnow()
+        context['is_not_author'] = not self.request.user.groups.filter(name = 'authors').exists()
         return context
 
 # дженерик для получения деталей о товаре
 class PostDetailView(DetailView):
     template_name = 'post_detail.html'
     queryset = Post.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name = 'authors').exists()
+        return context
  
  
 # дженерик для создания объекта. Надо указать только имя шаблона и класс формы, который мы написали в прошлом юните. Остальное он сделает за вас
-class PostCreateView(LoginRequiredMixin, CreateView):
+class PostCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = 'post_create.html'
     form_class = PostForm
-    success_url = reverse_lazy('post_create')
+    permission_required = ('news.add_post',)
+
 
 
 # дженерик для редактирования объекта
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = 'post_create.html'
     form_class = PostForm
+    permission_required = ('news.change_post',)
+
 
  
     # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте, который мы собираемся редактировать
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
         return Post.objects.get(pk=id)
+        
  
  
 # дженерик для удаления 
-class PostDeleteView(LoginRequiredMixin, DeleteView):
+class PostDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     template_name = 'post_delete.html'
     queryset = Post.objects.all()
     success_url = '/news'
+    permission_required = ('news.delete_post',)
+    raise_exception=True
+    login_url = 'search/'		
+
 
 
 class PostSearch(ListView):
@@ -69,4 +83,5 @@ class PostSearch(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = PostFilter(self.request.GET, queryset=self.get_queryset())  # вписываем наш фильтр в контекст
+        context['is_not_author'] = not self.request.user.groups.filter(name = 'authors').exists()
         return context

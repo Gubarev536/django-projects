@@ -17,4 +17,3 @@ class BaseRegisterForm(UserCreationForm):
                   "email", 
                   "password1", 
                   "password2", )
-# Create your models here.
